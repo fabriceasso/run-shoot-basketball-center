@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ChevronRight, Dribbble, Mail, Phone, MapPin, Instagram, Facebook, Award, Target, Users, Zap, X } from 'lucide-react'
+import { ChevronRight, Dribbble, Mail, Phone, MapPin, Instagram, Facebook, Award, Target, Users, Zap, X, Menu, Clock, Calendar } from 'lucide-react'
 import confetti from 'canvas-confetti'
 
 // Composants
@@ -89,7 +89,7 @@ const Loader = () => (
                 ease: "easeInOut"
             }}
         >
-            <img src="/ressources/images/favicon.png" alt="Loading" className="w-20 h-20" />
+            <img src="ressources/images/favicon.png" alt="Loading" className="w-20 h-20" />
         </motion.div>
         <motion.h1
             initial={{ opacity: 0 }}
@@ -139,7 +139,7 @@ const BasketballShot = () => {
             className="fixed inset-0 z-[2000] pointer-events-none w-16 h-16"
         >
             <img
-                src="/ressources/images/favicon.png"
+                src="ressources/images/favicon.png"
                 alt="Basketball"
                 className="w-full h-full drop-shadow-[0_15px_30px_rgba(255,102,0,0.6)]"
             />
@@ -149,6 +149,7 @@ const BasketballShot = () => {
 
 const Navbar = ({ onConfetti }) => {
     const [isScrolled, setIsScrolled] = useState(false)
+    const [isOpen, setIsOpen] = useState(false)
 
     useEffect(() => {
         const handleScroll = () => setIsScrolled(window.scrollY > 50)
@@ -156,37 +157,113 @@ const Navbar = ({ onConfetti }) => {
         return () => window.removeEventListener('scroll', handleScroll)
     }, [])
 
+    const navLinks = [
+        { href: "#about", label: "À Propos" },
+        { href: "#coach", label: "Staff" },
+        { href: "#programs", label: "Programmes" },
+        { href: "#usa", label: "Opportunités de bourses" },
+        { href: "#gallery", label: "Galerie" },
+        { href: "#contact", label: "Contact" }
+    ]
+
+    useEffect(() => {
+        if (isOpen) {
+            document.body.style.overflow = 'hidden'
+        } else {
+            document.body.style.overflow = 'unset'
+        }
+    }, [isOpen])
+
     return (
-        <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? 'glass py-3' : 'bg-transparent py-6'}`}>
-            <div className="container mx-auto px-6 flex justify-between items-center">
-                <div className="flex items-center gap-2">
-                    <img src="/ressources/images/logo_new.jpg" alt="RSBC Logo" className="h-12 w-auto rounded-full" />
-                    <span className="text-2xl font-black tracking-tighter">RS<span className="text-rsbc-orange">BC</span></span>
+        <>
+            <nav className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-300 ${isScrolled || isOpen ? 'bg-rsbc-black/95 backdrop-blur-lg border-b border-white/10 py-3' : 'bg-transparent py-6'}`}>
+                <div className="container mx-auto px-6 flex justify-between items-center text-white">
+                    <div className="flex items-center gap-2 relative z-[110]">
+                        <img src="ressources/images/logo_new.jpg" alt="RSBC Logo" className="h-10 md:h-12 w-auto rounded-full" />
+                        <span className="text-xl md:text-2xl font-black tracking-tighter uppercase italic text-white">RS<span className="text-rsbc-orange">BC</span></span>
+                    </div>
+
+                    {/* Desktop Menu */}
+                    <div className="hidden lg:flex gap-8 font-semibold">
+                        {navLinks.map((link) => (
+                            <a key={link.href} href={link.href} className="hover:text-rsbc-orange transition-colors uppercase tracking-widest text-sm text-white">
+                                {link.label}
+                            </a>
+                        ))}
+                    </div>
+
+                    <div className="flex items-center gap-4 relative z-[110]">
+                        {/* Mobile Toggle */}
+                        <button
+                            onClick={() => setIsOpen(!isOpen)}
+                            className="lg:hidden p-2 text-white hover:text-rsbc-orange transition-colors"
+                        >
+                            {isOpen ? <X size={32} /> : <Menu size={32} />}
+                        </button>
+                    </div>
                 </div>
-                <div className="hidden md:flex gap-8 font-semibold">
-                    <a href="#about" className="hover:text-rsbc-orange transition-colors">À Propos</a>
-                    <a href="#coach" className="hover:text-rsbc-orange transition-colors">Staff</a>
-                    <a href="#programs" className="hover:text-rsbc-orange transition-colors">Programmes</a>
-                    <a href="#usa" className="hover:text-rsbc-orange transition-colors">Opportunités de bourses</a>
-                    <a href="#contact" className="hover:text-rsbc-orange transition-colors">Contact</a>
-                </div>
-                <button onClick={onConfetti} className="btn-primary py-2 px-6 text-sm">S'INSCRIRE</button>
-            </div>
-        </nav>
+            </nav>
+
+            {/* Mobile Menu Overlay - Moved OUTSIDE of nav */}
+            <AnimatePresence>
+                {isOpen && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 bg-rsbc-black/75 backdrop-blur-xl z-[200] lg:hidden flex flex-col"
+                    >
+                        {/* Header interne de l'overlay pour aligner le bouton X avec le burger */}
+                        <div className="flex justify-between items-center p-6 h-[72px] md:h-[84px]">
+                            <div className="flex items-center gap-2">
+                                <img src="ressources/images/logo_new.jpg" alt="RSBC Logo" className="h-10 w-auto rounded-full" />
+                                <span className="text-xl font-black italic text-white">RS<span className="text-rsbc-orange">BC</span></span>
+                            </div>
+                            <button
+                                onClick={() => setIsOpen(false)}
+                                className="p-2 text-white hover:text-[#00FFFF] transition-colors"
+                            >
+                                <X size={32} />
+                            </button>
+                        </div>
+
+                        {/* Liens centrés */}
+                        <div className="flex-grow flex flex-col items-center justify-center gap-6 px-6">
+                            {navLinks.map((link, i) => (
+                                <motion.a
+                                    key={link.href}
+                                    href={link.href}
+                                    onClick={() => setIsOpen(false)}
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: i * 0.1 }}
+                                    className="text-2xl sm:text-3xl font-black uppercase tracking-[0.15em] text-[#00FFFF] hover:text-white transition-all text-center"
+                                >
+                                    <span className="text-rsbc-orange mr-2">/</span>
+                                    {link.label}
+                                </motion.a>
+                            ))}
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </>
     )
 }
 
 const Hero = ({ onConfetti }) => {
     const images = [
-        "/ressources/images/carrousel/featue-bg.jpg",
-        "/ressources/images/carrousel/pexels-chuck-3002981.jpg",
-        "/ressources/images/carrousel/pexels-dapo-abideen-1908900-5170498.jpg",
-        "/ressources/images/carrousel/pexels-ketut-subiyanto-4719821.jpg",
-        "/ressources/images/carrousel/heungsoon-basketball-3571730_1920.jpg",
-        "/ressources/images/carrousel/tortugamediaservices-basketball-2258651_1920.jpg",
-        "/ressources/images/carrousel/zdaschorsch-ball-7610545_1920.jpg",
-        "/ressources/images/carrousel/Google_AI_Studio_2025-11-12T18_13_25.172Z.png",
-        "/ressources/images/carrousel/Google_AI_Studio_2025-11-12T18_09_42.200Z.png"
+        "ressources/images/carrousel/alpha.jpeg",
+        "ressources/images/carrousel/featue-bg.jpg",
+        "ressources/images/carrousel/Gemini_Generated_Image_gs9ndjgs9ndjgs9n.jpg",
+        "ressources/images/carrousel/Google_AI_Studio_2025-11-12T18_09_42.200Z.jpg",
+        "ressources/images/carrousel/Google_AI_Studio_2025-11-12T18_13_25.172Z.jpg",
+        "ressources/images/carrousel/heungsoon-basketball-3571730_1920.jpg",
+        "ressources/images/carrousel/pexels-chuck-3002981.jpg",
+        "ressources/images/carrousel/pexels-dapo-abideen-1908900-5170498.jpg",
+        "ressources/images/carrousel/pexels-ketut-subiyanto-4719821.jpg",
+        "ressources/images/carrousel/tortugamediaservices-basketball-2258651_1920.jpg",
+        "ressources/images/carrousel/zdaschorsch-ball-7610545_1920.jpg"
     ]
     const [current, setCurrent] = useState(0)
 
@@ -255,7 +332,7 @@ const Hero = ({ onConfetti }) => {
                     initial={{ y: 50, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ delay: 0.7 }}
-                    className="text-6xl md:text-8xl font-black mb-6 leading-tight"
+                    className="text-5xl sm:text-6xl md:text-8xl font-black mb-6 leading-tight mt-12 md:mt-0"
                 >
                     DEVENEZ LA PROCHAINE <br />
                     <span className="neon-text-orange italic">STAR DU BASKET !</span>
@@ -303,7 +380,7 @@ const Hero = ({ onConfetti }) => {
 
 const About = () => (
     <section id="about" className="py-32 bg-rsbc-black relative overflow-hidden">
-        <SectionBackground src="/ressources/images/featue-bg.jpg" />
+        <SectionBackground src="ressources/images/featue-bg.jpg" />
         <div className="container mx-auto px-6 grid md:grid-cols-2 gap-16 items-center relative z-10">
             <motion.div
                 whileInView={{ x: 0, opacity: 1 }}
@@ -312,7 +389,7 @@ const About = () => (
             >
                 <div className="absolute -inset-4 bg-rsbc-orange/20 rounded-3xl blur-2xl"></div>
                 <img
-                    src="/ressources/images/logo_new.jpg"
+                    src="ressources/images/logo_new.jpg"
                     alt="RSBC Training"
                     className="relative rounded-3xl w-full h-[500px] object-cover border-2 border-rsbc-orange/30 shadow-2xl"
                 />
@@ -351,7 +428,7 @@ const About = () => (
 // Composants pour le reste de la page
 const Coach = () => (
     <section id="coach" className="py-32 bg-rsbc-black relative overflow-hidden">
-        <SectionBackground src="/ressources/images/oleksii-s-O2kqxbix4Mw-unsplash.jpg" />
+        <SectionBackground src="ressources/images/oleksii-s-O2kqxbix4Mw-unsplash.jpg" />
         <div className="container mx-auto px-6 relative z-10">
             <div className="flex flex-col md:flex-row items-center gap-16">
                 <motion.div
@@ -362,7 +439,7 @@ const Coach = () => (
                     <div className="absolute -inset-10 bg-rsbc-neonBlue/20 rounded-full blur-3xl animate-pulse"></div>
                     <div className="relative border-4 border-rsbc-neonBlue/30 rounded-[2rem] overflow-hidden group">
                         <img
-                            src="/ressources/images/alphamane.jpg"
+                            src="ressources/images/alphamane.jpg"
                             alt="Coach Alpha Mané"
                             className="w-full h-[600px] object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
                         />
@@ -475,9 +552,9 @@ const ProgramCard = ({ p, i }) => {
 
 const Programs = () => (
     <section id="programs" className="py-32 bg-rsbc-black relative overflow-hidden">
-        <SectionBackground src="/ressources/images/featue-bg.jpg" />
+        <SectionBackground src="ressources/images/featue-bg.jpg" />
         <div className="container mx-auto px-6 relative z-10">
-            <div className="text-center mb-20">
+            <div className="text-center mb-16">
                 <motion.h2
                     whileInView={{ opacity: 1, y: 0 }}
                     initial={{ opacity: 0, y: 20 }}
@@ -489,10 +566,41 @@ const Programs = () => (
                     whileInView={{ opacity: 1, y: 0 }}
                     initial={{ opacity: 0, y: 20 }}
                     transition={{ delay: 0.1 }}
-                    className="text-5xl md:text-7xl font-black"
+                    className="text-5xl md:text-7xl font-black mb-12"
                 >
                     Forgez votre <span className="neon-text-orange italic">Destin</span>
                 </motion.h3>
+
+                {/* Bloc Horaires */}
+                <motion.div
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    className="inline-flex flex-wrap justify-center gap-8 p-8 glass rounded-[2rem] border-t-2 border-white/10 mb-10"
+                >
+                    <div className="flex items-center gap-3">
+                        <Calendar className="text-rsbc-orange" size={24} />
+                        <div className="text-left">
+                            <p className="text-xs text-gray-400 font-bold uppercase tracking-widest">Mercredi</p>
+                            <p className="text-lg font-black">14h - 18h</p>
+                        </div>
+                    </div>
+                    <div className="h-10 w-px bg-white/10 hidden sm:block"></div>
+                    <div className="flex items-center gap-3">
+                        <Calendar className="text-rsbc-orange" size={24} />
+                        <div className="text-left">
+                            <p className="text-xs text-gray-400 font-bold uppercase tracking-widest">Samedi</p>
+                            <p className="text-lg font-black">8h - 12h</p>
+                        </div>
+                    </div>
+                    <div className="h-10 w-px bg-white/10 hidden sm:block"></div>
+                    <div className="flex items-center gap-3">
+                        <Clock className="text-rsbc-neonBlue" size={24} />
+                        <div className="text-left">
+                            <p className="text-xs text-gray-400 font-bold uppercase tracking-widest">Privé</p>
+                            <p className="text-lg font-black italic">Sur RDV</p>
+                        </div>
+                    </div>
+                </motion.div>
             </div>
 
             <div className="grid md:grid-cols-3 gap-10 items-start">
@@ -526,13 +634,13 @@ const Programs = () => (
                 ))}
             </div>
         </div>
-    </section>
+    </section >
 )
 const USAOpportunities = ({ onConfetti }) => {
     const images = [
-        "/ressources/images/pexels-pixabay-159611.jpg",
-        "/ressources/images/ryan-OywyPkrDEvg-unsplash.jpg",
-        "/ressources/images/mick-haupt-W2BqFB4me7k-unsplash.jpg"
+        "ressources/images/pexels-pixabay-159611.jpg",
+        "ressources/images/ryan-OywyPkrDEvg-unsplash.jpg",
+        "ressources/images/mick-haupt-W2BqFB4me7k-unsplash.jpg"
     ]
     const [current, setCurrent] = useState(0)
 
@@ -544,30 +652,30 @@ const USAOpportunities = ({ onConfetti }) => {
     }, [])
 
     return (
-        <section id="usa" className="py-32 relative overflow-hidden">
+        <section id="usa" className="py-20 md:py-32 relative overflow-hidden">
             <div className="absolute inset-0 bg-rsbc-orange"></div>
             <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]"></div>
-            <SectionBackground src="/ressources/images/oleksii-s-O2kqxbix4Mw-unsplash.jpg" />
+            <SectionBackground src="ressources/images/oleksii-s-O2kqxbix4Mw-unsplash.jpg" />
             <div className="container mx-auto px-6 relative z-10 text-rsbc-black">
-                <div className="bg-rsbc-black text-white p-12 md:p-20 rounded-[3rem] shadow-2xl flex flex-col md:flex-row items-center gap-12">
-                    <div className="md:w-3/5">
-                        <h2 className="text-rsbc-orange font-black text-6xl md:text-7xl mb-6 tracking-tighter">Visez les <br /> <span className="text-white underline decoration-rsbc-orange">USA</span>.</h2>
-                        <p className="text-xl md:text-2xl font-bold mb-8 text-gray-300">
+                <div className="bg-rsbc-black text-white p-8 md:p-20 rounded-[2rem] md:rounded-[3rem] shadow-2xl flex flex-col md:flex-row items-center gap-10 md:gap-12">
+                    <div className="md:w-3/5 text-center md:text-left">
+                        <h2 className="text-rsbc-orange font-black text-4xl sm:text-5xl md:text-7xl mb-6 tracking-tighter uppercase italic">Visez les <br /> <span className="text-white underline decoration-rsbc-orange">USA</span>.</h2>
+                        <p className="text-lg md:text-2xl font-bold mb-8 text-gray-300">
                             Grâce à nos partenariats exclusifs avec des académies et lycées américains, nous pouvons faciliter aux meilleurs éléments de RSBC l'obtention de bourses d'études sportives.
                         </p>
-                        <ul className="space-y-4 mb-10">
+                        <ul className="space-y-4 mb-10 text-left">
                             {["Placement en High School & College", "Suivi administratif personnalisé", "Préparation aux tests d'entrée"].map((item, i) => (
-                                <li key={i} className="flex items-center gap-3 text-lg font-bold">
-                                    <div className="h-2 w-8 bg-rsbc-orange"></div>
+                                <li key={i} className="flex items-center gap-3 text-base md:text-lg font-bold">
+                                    <div className="h-1.5 w-6 md:w-8 bg-rsbc-orange shrink-0"></div>
                                     {item}
                                 </li>
                             ))}
                         </ul>
-                        <button onClick={onConfetti} className="btn-primary text-xl px-12 py-5 shadow-[0_20px_50px_rgba(255,102,0,0.3)] hover:bg-rsbc-neonBlue hover:text-rsbc-black hover:scale-110">
+                        <button onClick={onConfetti} className="btn-primary text-lg md:text-xl px-8 md:px-12 py-4 md:py-5 shadow-[0_20px_50px_rgba(255,102,0,0.3)] hover:scale-110 w-full md:w-auto">
                             JE POSTULE (SESSION 2026)
                         </button>
                     </div>
-                    <div className="md:w-2/5 relative h-[400px]">
+                    <div className="md:w-2/5 relative h-[300px] md:h-[400px] w-full">
                         <AnimatePresence mode="wait">
                             <motion.img
                                 key={current}
@@ -577,10 +685,10 @@ const USAOpportunities = ({ onConfetti }) => {
                                 animate={{ opacity: 1, x: 0, rotate: 3 }}
                                 exit={{ opacity: 0, x: -20, rotate: 1 }}
                                 transition={{ duration: 0.8 }}
-                                className="absolute inset-0 w-full h-full object-cover rounded-3xl shadow-2xl border-8 border-rsbc-orange/20"
+                                className="absolute inset-0 w-full h-full object-cover rounded-3xl shadow-2xl border-4 md:border-8 border-rsbc-orange/20"
                             />
                         </AnimatePresence>
-                        <div className="absolute -top-6 -right-6 bg-rsbc-orange text-white p-4 rounded-full font-black animate-bounce z-20">
+                        <div className="absolute -top-4 -right-4 bg-rsbc-orange text-white p-3 md:p-4 rounded-full font-black animate-bounce z-20 text-xs md:text-base">
                             NEW !
                         </div>
                     </div>
@@ -595,27 +703,34 @@ const Gallery = ({ onConfetti }) => {
     const [showAll, setShowAll] = useState(false)
 
     const allImages = [
-        { src: "/ressources/images/img_gallerie/maneph.jpg", span: "", caption: "Coach Alpha Mané en plein coaching tactique." },
-        { src: "/ressources/images/img_gallerie/pexels-alexis-kiza-2149714901-32759160.jpg", span: "h-80", caption: "L'intensité d'un match sous les projecteurs." },
-        { src: "/ressources/images/img_gallerie/pexels-chris-wade-ntezicimpa-564856410-32600319.jpg", span: "", caption: "Préparation physique des jeunes talents." },
-        { src: "/ressources/images/img_gallerie/pexels-dapo-abideen-1908900-5170498.jpg", span: "h-96", caption: "Le focus ultime avant le tir décisif." },
-        { src: "/ressources/images/img_gallerie/pexels-ketut-subiyanto-4719821.jpg", span: "", caption: "L'excellence au cœur de l'entraînement." },
-        { src: "/ressources/images/img_gallerie/pexels-luanqueiros-3260939.jpg", span: "h-80", caption: "La détermination d'un futur champion." },
-        { src: "/ressources/images/img_gallerie/pexels-ola-dapo-1754561-3534674.jpg", span: "", caption: "Vitesse et agilité sur le parquet." },
-        { src: "/ressources/images/img_gallerie/pexels-victor-chijioke-350220031-20041461.jpg", span: "", caption: "Travail technique et maîtrise du dribble." },
-        { src: "/ressources/images/img_gallerie/stephen-baker-QAX5Ylx-lKo-unsplash.jpg", span: "h-96", caption: "Puissance et ambition : l'envol." },
-        { src: "/ressources/images/img_gallerie/tom-briskey-AddAnDkkovM-unsplash.jpg", span: "", caption: "Le terrain mythique du Lycée Classique d'Abidjan." },
-        { src: "/ressources/images/img_gallerie/august-phlieger-CREqtqgBFcU-unsplash.jpg", span: "", caption: "Slam dunk spectaculaire en session Élite." },
-        { src: "/ressources/images/img_gallerie/megashock-jordan-4657349_1920.jpg", span: "", caption: "L'héritage du basket pour la jeunesse." },
-        { src: "/ressources/images/img_gallerie/Gemini_Generated_Image_r1mtn0r1mtn0r1mt.jpg", span: "", caption: "Vision moderne du centre RSBC." },
-        { src: "/ressources/images/img_gallerie/Gemini_Generated_Image_tsy7jntsy7jntsy7.jpg", span: "", caption: "Esprit d'équipe et cohésion RSBC." }
+        { src: "ressources/images/img_gallerie/august-phlieger-CREqtqgBFcU-unsplash.jpg", span: "", caption: "Slam dunk spectaculaire en session Élite." },
+        { src: "ressources/images/img_gallerie/Gemini_Generated_Image_r1mtn0r1mtn0r1mt.jpg", span: "", caption: "Vision moderne du centre RSBC." },
+        { src: "ressources/images/img_gallerie/Gemini_Generated_Image_tsy7jntsy7jntsy7.jpg", span: "", caption: "Esprit d'équipe et cohésion RSBC." },
+        { src: "ressources/images/img_gallerie/maneph.jpg", span: "", caption: "Coach Alpha Mané en plein coaching tactique." },
+        { src: "ressources/images/img_gallerie/megashock-jordan-4657349_1920.jpg", span: "h-80", caption: "L'héritage du basket pour la jeunesse." },
+        { src: "ressources/images/img_gallerie/pexels-alexis-kiza-2149714901-32759160.jpg", span: "", caption: "L'intensité d'un match sous les projecteurs." },
+        { src: "ressources/images/img_gallerie/pexels-chris-wade-ntezicimpa-564856410-32600319.jpg", span: "h-96", caption: "Préparation physique des jeunes talents." },
+        { src: "ressources/images/img_gallerie/pexels-dapo-abideen-1908900-5170498.jpg", span: "", caption: "Le focus ultime avant le tir décisif." },
+        { src: "ressources/images/img_gallerie/pexels-ketut-subiyanto-4719821.jpg", span: "h-80", caption: "L'excellence au cœur de l'entraînement." },
+        { src: "ressources/images/img_gallerie/pexels-luanqueiros-3260939.jpg", span: "", caption: "La détermination d'un futur champion." },
+        { src: "ressources/images/img_gallerie/pexels-ola-dapo-1754561-3534674.jpg", span: "h-96", caption: "Vitesse et agilité sur le parquet." },
+        { src: "ressources/images/img_gallerie/pexels-victor-chijioke-350220031-20041461.jpg", span: "", caption: "Travail technique et maîtrise du dribble." },
+        { src: "ressources/images/img_gallerie/stephen-baker-QAX5Ylx-lKo-unsplash.jpg", span: "h-80", caption: "Puissance et ambition : l'envol." },
+        { src: "ressources/images/img_gallerie/tom-briskey-AddAnDkkovM-unsplash.jpg", span: "", caption: "Le terrain mythique du Lycée Classique d'Abidjan." },
+        { src: "ressources/images/img_gallerie/WhatsApp Image 2026-02-27 at 10.32.32 (1).jpeg", span: "h-96", caption: "Jeunes en pleine action sur le terrain." },
+        { src: "ressources/images/img_gallerie/WhatsApp Image 2026-02-27 at 10.32.33 (1).jpeg", span: "", caption: "L'équipe s'entraîne." },
+        { src: "ressources/images/img_gallerie/WhatsApp Image 2026-02-27 at 10.32.33.jpeg", span: "h-80", caption: "Photo de groupe avec le sourire." },
+        { src: "ressources/images/img_gallerie/WhatsApp Image 2026-02-27 at 10.32.34 (1).jpeg", span: "", caption: "Briefing avec Coach Alpha." },
+        { src: "ressources/images/img_gallerie/WhatsApp Image 2026-02-27 at 10.32.35 (2).jpeg", span: "h-96", caption: "Session de lancer." },
+        { src: "ressources/images/img_gallerie/WhatsApp Image 2026-02-27 at 10.32.35.jpeg", span: "", caption: "Exercice de dextérité." },
+        { src: "ressources/images/img_gallerie/WhatsApp Image 2026-02-27 at 10.32.36 (1).jpeg", span: "h-80", caption: "Concentration avant de shooter." }
     ]
 
     const displayedImages = showAll ? allImages : allImages.slice(0, 8)
 
     return (
-        <section className="py-32 bg-rsbc-black relative overflow-hidden">
-            <SectionBackground src="/ressources/images/featue-bg.jpg" />
+        <section id="gallery" className="py-32 bg-rsbc-black relative overflow-hidden">
+            <SectionBackground src="ressources/images/featue-bg.jpg" />
             <div className="container mx-auto px-6 relative z-10">
                 <div className="flex justify-between items-end mb-16">
                     <div>
@@ -744,7 +859,7 @@ const Contact = ({ onConfetti }) => {
 
     return (
         <section id="contact" className="py-32 bg-rsbc-black relative overflow-hidden">
-            <SectionBackground src="/ressources/images/oleksii-s-O2kqxbix4Mw-unsplash.jpg" />
+            <SectionBackground src="ressources/images/oleksii-s-O2kqxbix4Mw-unsplash.jpg" />
             <div className="container mx-auto px-6 relative z-10">
                 <div className="flex flex-col lg:flex-row gap-20">
                     <div className="lg:w-1/2">
@@ -768,7 +883,7 @@ const Contact = ({ onConfetti }) => {
                             {[
                                 { icon: <MapPin />, title: "Lieu d'entraînement", text: "Lycée Classique d'Abidjan, Cocody-Abiidjan, Côte d'Ivoire" },
                                 { icon: <Phone />, title: "Téléphone", text: "+225 07 07 98  75 18" },
-                                { icon: <Mail />, title: "Email", text: "direction@rsbc-abidjan.ci" }
+                                { icon: <Mail />, title: "Email", text: "alphamane954@gmail.com " }
                             ].map((item, i) => (
                                 <motion.div
                                     key={i}
@@ -936,7 +1051,7 @@ const Footer = () => (
             <div className="grid md:grid-cols-4 gap-12 mb-20">
                 <div className="col-span-2">
                     <div className="flex items-center gap-3 mb-8">
-                        <img src="/ressources/images/logo_new.jpg" alt="RSBC Logo" className="h-16 w-auto rounded-full border-2 border-rsbc-orange" />
+                        <img src="ressources/images/logo_new.jpg" alt="RSBC Logo" className="h-16 w-auto rounded-full border-2 border-rsbc-orange" />
                         <span className="text-3xl font-black tracking-tighter uppercase">Run & Shoot <span className="text-rsbc-orange">Basketball  Center</span></span>
                     </div>
                     <p className="text-gray-500 text-lg max-w-md mb-8">
@@ -954,8 +1069,19 @@ const Footer = () => (
                 <div>
                     <h4 className="font-black text-xl mb-8 uppercase tracking-widest text-rsbc-orange">Navigation</h4>
                     <ul className="space-y-4 text-gray-400 font-bold">
-                        {["À Propos", "Staff", "Programmes", "Bourses USA", "Contact"].map((item, i) => (
-                            <li key={i}><a href={`#${item.toLowerCase().replace(' ', '')}`} className="hover:text-white transition-colors">/ {item}</a></li>
+                        {[
+                            { href: "#about", label: "À Propos" },
+                            { href: "#coach", label: "Staff" },
+                            { href: "#programs", label: "Programmes" },
+                            { href: "#usa", label: "Opportunités de bourses" },
+                            { href: "#gallery", label: "Galerie" },
+                            { href: "#contact", label: "Contact" }
+                        ].map((link, i) => (
+                            <li key={i}>
+                                <a href={link.href} className="hover:text-white transition-colors uppercase tracking-tight">
+                                    / {link.label}
+                                </a>
+                            </li>
                         ))}
                     </ul>
                 </div>
